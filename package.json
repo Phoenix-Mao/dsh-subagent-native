@@ -1,22 +1,49 @@
 {
   "name": "@local/dsh-subagent-native",
   "version": "0.1.0",
-  "private": true,
-  "description": "把本机原生 codex / claude CLI 注册成 DSH 的 subagent provider：走原生配置与账号（中转站按渠道计费），同时保留官方的 catalog / 完成通知 / 容量限制。",
+  "description": "把本机原生 codex / claude CLI 注册成 DSH 的子代理通道：走 CLI 原生配置与账号，框架可兜底派发，带并行扇出、预算护栏和成本核算。",
   "type": "module",
   "main": "index.js",
   "exports": {
     ".": "./index.js",
-    "./client": "./client.js"
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
   },
+  "icon": "./icon.svg",
   "files": [
     "index.js",
     "client.js",
     "lib",
+    "locale/*.json",
+    "icon.svg",
     "cordis.patch.yml",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "docs"
   ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "subagent",
+    "codex",
+    "claude",
+    "agent-orchestration"
+  ],
+  "license": "MIT",
+  "author": "毛烽炜 (Phoenix-Mao)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Phoenix-Mao/dsh-subagent-native.git"
+  },
+  "homepage": "https://github.com/Phoenix-Mao/dsh-subagent-native#readme",
+  "bugs": {
+    "url": "https://github.com/Phoenix-Mao/dsh-subagent-native/issues"
+  },
   "dsh": {
+    "manifestVersion": 1,
     "bundle": {
       "patch": "./cordis.patch.yml"
     },
@@ -24,11 +51,16 @@
       "platform": "web"
     }
   },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.3",
+    "@deepseek-ai/schemastery": "^3.18.3"
+  },
   "scripts": {
     "test": "node --test",
     "lint": "node --check index.js && node --check client.js && node --check lib/codex-run.js && node --check lib/claude-run.js && node --check lib/history.js && node --check lib/budget.js && node --check lib/ledger.js && node --check lib/decisions.js && node --check lib/config.js && node --check lib/route-line.js && node --check lib/split.js && node --check lib/rules.js && node --check lib/difficulty.js && node --check lib/brief.js && node --check lib/native-config.js && node --check lib/git-snapshot.js && node --check lib/guard.js"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22",
+    "dsh": ">=0.2.2-rc.5 <0.3.0"
   }
 }

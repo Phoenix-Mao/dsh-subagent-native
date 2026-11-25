@@ -34,8 +34,8 @@
 
 ## 三、分阶段计划
 
-> **状态（2026-11-25 更新）**：P0 代码项与 P1 加固项已完成并通过 143 个单测；
-> 发布侧（打包合规 / 文档 / CI）尚未开始。
+> **状态（2026-11-25/26 更新）**：代码项与 P1 打包合规已完成（143 个单测全过，
+> `npm pack` 27 文件 / 62.9 kB）；剩余 P0 改名（推迟到 P4）、P2 文档、P3 跨平台与安全复核、P4 发布。
 
 ### ✅ 已完成（原 P0 / P1 的代码部分）
 
@@ -66,14 +66,14 @@
 
 ### P1 · 打包合规（1 天）
 
-- [ ] `package.json`：去 `private`、加 `engines.dsh`（`>=0.2.2-rc.5 <0.3.0`）、`keywords: ["dsh","dsh-plugin","subagent","codex","claude","deepseek-harness"]`、`repository`、`license`、`exports`/`files` 补齐（locale / icon / docs）
-- [ ] `locale/en.json` + `locale/zh.json`：`meta.title` / `meta.description`（说清「做什么、在哪看、有什么风险、关掉会怎样」）
-- [ ] `icon.svg`：原创、单色可读、≤256 KiB
-- [ ] `cordis.patch.yml`：行名改为发布名（代码里已有 `PACKAGE_NAME` 常量，改一处即可）
-- [ ] `LICENSE` 文件
-- [ ] `npm pack` 后核对真实文件清单（不能靠 `files` 推断）
+- [x] `package.json`：去 `private`、`engines.dsh: ">=0.2.2-rc.5 <0.3.0"`、keywords、repository / homepage / bugs、`license: MIT`+`author`、`exports`（`./locale/*.json` / `./icon` / `./package.json`）、`files` 补齐 — **2026-11-25 完成**
+- [x] `locale/en.json` + `locale/zh.json`：`meta.title` / `meta.description` 中英双语 — 完成
+- [x] `icon.svg`：原创单色线条（24×24，`currentColor`，541 B）— 完成
+- [ ] `cordis.patch.yml`：行名改为发布名 — **推迟到 P4 与包名一起改**（见 `PUBLISH-DECISIONS.md` §6）
+- [x] `LICENSE`（MIT）— 完成
+- [x] `npm pack --dry-run` 核对：27 个文件 / 62.9 kB（含 LICENSE、README、locale、icon、docs；不含 test/）— 完成
 
-验收：`npm pack --dry-run` 列表与设计一致；解包目录在干净 profile 里能装、provider 注册、工具出现。
+验收：`npm pack --dry-run` 列表与设计一致（✅）；解包目录在干净 profile 里能装（P4 做）。
 
 ### P2 · 文档与默认值（1 天）
 
@@ -86,7 +86,7 @@
 
 ### P3 · 质量门（1 天）
 
-- [ ] GitHub Actions：`node --test`（136 用例）+ lint + `npm pack` 文件校验
+- [x] GitHub Actions：Windows 上 `npm test`（143 用例）+ lint + `npm pack --dry-run`；Linux 先做实验性 job（`continue-on-error`）— 已写 `.github/workflows/ci.yml`，待推送后验证
 - [ ] 跨平台冒烟：macOS / Linux 上至少验证 `buildCodexArgs` / `buildClaudeArgs` 与进程终止；参数差异记进 README
 - [ ] DSH 版本兼容：在 0.2.2-rc.5 上装一遍；记录 provider 契约的版本敏感性
 - [ ] 安全复核：无 token/本机路径进包；`npm pack` 内容人工过一遍

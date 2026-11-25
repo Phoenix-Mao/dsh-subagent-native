@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # 主目标平台：作者开发环境就是 Windows，发布前必须绿
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: 单测
+        run: npm test
+      - name: 语法检查
+        run: npm run lint
+      - name: 打包内容校验
+        run: npm pack --dry-run
+
+  # 实验性：目前只在 Windows 验证过，先跑不阻塞（P3 转正）
+  linux:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: git 身份（git-snapshot 用例需要）
+        run: |
+          git config --global user.name ci
+          git config --global user.email ci@example.com
+      - name: 单测
+        run: npm test
+      - name: 语法检查
+        run: npm run lint

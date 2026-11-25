@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Subagent Native",
+    "description": "Registers your local native codex / claude CLIs as DSH subagent channels — they use the CLI's own config and account, with optional framework fallback dispatch, parallel fan-out, budget guard and cost accounting."
+  }
+}
