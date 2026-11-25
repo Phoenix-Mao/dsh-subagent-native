@@ -33,6 +33,10 @@
   ],
   "license": "MIT",
   "author": "毛烽炜 (Phoenix-Mao)",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Phoenix-Mao/dsh-subagent-native.git"
