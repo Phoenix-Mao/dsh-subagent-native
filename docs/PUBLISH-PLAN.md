@@ -86,7 +86,12 @@
 
 ### P3 · 质量门（1 天）
 
-- [x] GitHub Actions：Windows 上 `npm test`（143 用例）+ lint + `npm pack --dry-run`；Linux 先做实验性 job（`continue-on-error`）— 已写 `.github/workflows/ci.yml`，待推送后验证
+- [x] GitHub Actions：Windows/Node 24 上 `npm test`（143 用例）+ lint + `npm pack --dry-run`（必过）；
+      `node22` 与 `linux` 两个信息性 job（`continue-on-error`）— 2026-11-26 首次跑通后修正
+- [ ] **Node 22 待查**：6 个「提前退出/取消」用例在 Node 22 上触发 `node:test` 的
+      pending-promise 判定（`Promise resolution is still pending but the event loop has already resolved`），
+      Node 24 正常。怀疑与 `idleTimer.unref()` / `drain.unref()` 有关，需在 22 上单独复现后决定
+      是改代码还是把 `engines.node` 收紧到 `>=24`
 - [ ] 跨平台冒烟：macOS / Linux 上至少验证 `buildCodexArgs` / `buildClaudeArgs` 与进程终止；参数差异记进 README
 - [ ] DSH 版本兼容：在 0.2.2-rc.5 上装一遍；记录 provider 契约的版本敏感性
 - [ ] 安全复核：无 token/本机路径进包；`npm pack` 内容人工过一遍
