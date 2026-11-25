@@ -22,6 +22,7 @@ import { applyThreshold, countPaths, estimateDifficulty } from './lib/difficulty
 import { captureBaseline, describeChanges, diffSince } from './lib/git-snapshot.js';
 import { buildRecord, createHistoryStore, estimateFailedCost, preview, projectCost, summarize } from './lib/history.js';
 import { claudeEffectiveConfig, codexEffectiveConfig } from './lib/native-config.js';
+import { missingCliMessage, summarizeCli } from './lib/cli-probe.js';
 import { DEFAULT_RULES, decideByRules, validateRules } from './lib/rules.js';
 import { extractPlan, shouldRelay } from './lib/relay.js';
 import { createDecisionLog } from './lib/decisions.js';
@@ -144,6 +145,26 @@ export function apply(ctx, rawConfig) {
   const budgetState = (projected = 0) =>
     checkBudget({ spent: ledger.today(), inFlight: inFlightTotal(), projected, budget: cfg.budget });
 
+  /**
+   * CLI 可用性（PATH 扫描，纯 fs.stat，不启动进程）。
+   * 设置页会轮询，所以缓存；配置里换了 command 时清掉。
+   */
+  let cliProbeCache = null;
+  const cliStatus = () => {
+    if (!cliProbeCache) {
+      cliProbeCache = {
+        codex: summarizeCli(cfg.codex.command || 'codex'),
+        claude: summarizeCli(cfg.claude.command || 'claude'),
+      };
+    }
+    return cliProbeCache;
+  };
+  /** 派发前现测一次：用户可能刚装上 CLI，别拿旧缓存拦人。 */
+  const cliProbeNow = (channelKey) =>
+    summarizeCli(
+      channelKey === 'codex' ? (cfg.codex.command || 'codex') : (cfg.claude.command || 'claude'),
+    );
+
   /** 设置页读的完整快照。 */
   const configSnapshot = () => {
     const gate = budgetState();
@@ -171,9 +192,10 @@ export function apply(ctx, rawConfig) {
         remaining: gate.ok && gate.limit > 0 ? gate.remaining : null,
         usage: budgetUsage(gate),
       },
-      codex: { providerName: cfg.codex.providerName, model: cfg.codex.model, effort: cfg.codex.effort, sandbox: cfg.codex.sandbox },
+      codex: { providerName: cfg.codex.providerName, command: cfg.codex.command, model: cfg.codex.model, effort: cfg.codex.effort, sandbox: cfg.codex.sandbox },
       claude: {
         providerName: cfg.claude.providerName,
+        command: cfg.claude.command,
         model: cfg.claude.model,
         effort: cfg.claude.effort,
         permissionMode: cfg.claude.permissionMode,
@@ -186,6 +208,8 @@ export function apply(ctx, rawConfig) {
         codex: { ...cfg.pricing.codex },
         claude: { ...cfg.pricing.claude },
       },
+      // CLI 是否在 PATH 里：没装时设置页直接提示，不要等第一次派发才报错
+      cli: cliStatus(),
       options: {
         difficulties: LEVELS,
         claudeEfforts: ['', 'low', 'medium', 'high', 'xhigh', 'max'],
@@ -205,6 +229,8 @@ export function apply(ctx, rawConfig) {
 
     const next = normalizePatch(patch);
     await editor.edit(entry, (current = {}, inherited = {}) => mergeConfig(current, inherited, next));
+    // 命令没变也会重载，但清一下缓存最稳妥：用户可能刚好补装了 CLI
+    cliProbeCache = null;
     return next;
   };
 
@@ -311,6 +337,18 @@ export function apply(ctx, rawConfig) {
         if (!cwdVerdict.ok) throw new Error(`subagent-native(${channelKey}): ${cwdVerdict.reason}`);
         const prompt = textOf(request?.prompt);
         if (!prompt.trim()) throw new Error(`subagent-native(${channelKey}): 任务内容为空`);
+
+        // CLI 预检：命令不存在时给「装什么 + 怎么改」的明确提示，而不是 ENOENT
+        const probe = cliProbeNow(channelKey);
+        if (!probe.found) {
+          throw new Error(
+            `subagent-native(${channelKey}): ${missingCliMessage({
+              channel: channelKey,
+              command: probe.command,
+              reason: probe.reason,
+            })}`,
+          );
+        }
         const label = String(request?.label ?? '');
         const relayMatch = /^auto:relay:(plan|exec)$/.exec(label);
         const relayStage = relayMatch ? relayMatch[1] : null;

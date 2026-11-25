@@ -2,6 +2,46 @@
 
 把本机**原生** `codex` / `claude` CLI 注册成 DSH 的 subagent provider，并在模型不主动派时由框架兜底触发。
 
+## 安装
+
+**从 npm**（发布后）：
+
+```bash
+dsh plugin add dsh-subagent-native
+```
+
+**从源码**（当前阶段）：
+
+```bash
+git clone https://github.com/Phoenix-Mao/dsh-subagent-native.git
+cd dsh-subagent-native
+npm test          # 152 用例（1 个 POSIX-only 用例在 Windows 上跳过）
+```
+
+然后在 profile 的 `package.json` 里加 `"dsh-subagent-native": "link:<仓库绝对路径>"`，
+并把同名项加进 `dsh.profile.bundles`。改完 profile 需要重启 DSH。
+
+## 前置依赖
+
+| 通道 | 依赖 | 自检命令 | 没装会怎样 |
+|---|---|---|---|
+| `native-codex` | codex CLI（0.169+） | `codex --version` | 派发时明确报错并给出安装命令，不会静默失败 |
+| `native-claude` | Claude Code CLI（2.1+） | `claude --version` | 同上 |
+
+两条通道都要求 CLI **已经用你自己的账号跑通过一次**（`codex exec "hi"` / `claude -p "hi"`）。
+插件只是把 CLI 包成 provider，**不负责登录、鉴权、代理配置**——那些仍是 CLI 自己的事。
+
+设置页会显示每条通道的 CLI 探测结果：找不到时顶部有红色提示，并给出「填绝对路径」的输入框。
+
+## 快速开始
+
+1. 装好依赖，终端里 `codex --version` / `claude --version` 能出结果
+2. 重启 DSH（或重载插件）
+3. 打开 设置 → **子代理**
+4. 勾选「允许模型调用」（`tools.enabled`）或「框架派发」（`auto.enabled`）
+
+两个开关都关着时，插件**不会注册 provider**，模型侧连工具都看不到——这是有意的安全默认。
+
 ## 为什么不是「自己 spawn + 注入」（auto-delegate 的老路）
 
 注册成官方 provider 后，官方那一整套自动生效：catalog、完成通知、容量限制、团队任务板、`subagent/start|end` 事件。
@@ -211,3 +251,19 @@ stopReason / exitCode / 事件数 / 诊断 / stderr 尾部。
 - `team.maxParallel: 1` 表示不扇出（不是「拆两份」）。
 - 判定日志重启后从文件恢复最近 200 条，文件超 1MB 保留最近 200。
 - 配置解析/校验集中在 `lib/config.js`（纯函数，有单测）；`index.js` 只留编排与接口。
+- CLI 探测集中在 `lib/cli-probe.js`：只做 PATH 扫描（`fs.stat`），不启动进程，不在启动路径上花时间。
+
+## 故障排查
+
+| 现象 | 原因 | 怎么办 |
+|---|---|---|
+| 设置页显示「未找到 codex/claude」 | CLI 不在 PATH 里 | 重开终端确认 `codex --version` 能跑；或在设置页「CLI 路径」填绝对路径 |
+| 模型侧看不到 `subagent_native_*` 工具 | `tools.enabled` / `auto.enabled` 都是 false（默认值） | 去设置页打开其中一个 |
+| 派发报「找不到 XXX CLI」但终端里明明有 | DSH 启动时的 PATH 和你现在终端里的 PATH 不是同一份 | 关掉 DSH，从能跑通 CLI 的终端启动它；或用绝对路径 |
+| 报 `SessionFormatError` / 会话打不开 | 本插件不写会话日志；检查是不是别的插件用字符串调了 `agent.inject` | 见 DSH 的 inbox 契约：必须传 UserMessage 对象 |
+| 成本估算明显偏高 | 计价器还是内置的中转站价 | 在 `config.pricing` 里改成你实际的价目 |
+| 派发成功但主代理把同一件事又做了一遍 | 关掉了「让出」（`auto.yield: false`） | 打开 `auto.yield`，或把 `yieldMinutes` 调大 |
+| Windows 上 git push/pull 卡住 | 与本插件无关 | 这是网络问题，不是插件行为 |
+
+排查原则：**先看 `%TEMP%\dsh-subagent-native.log`**（插件自写的诊断日志，Host 里看不到 `ctx.logger`）。
+

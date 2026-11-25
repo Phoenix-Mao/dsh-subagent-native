@@ -437,6 +437,24 @@ window.__ModuleLoader__.load({
             { className: 'sne-card' },
             h('div', { className: 'sne-cardtitle' }, 'codex cli'),
             h('div', { className: 'sne-cardsub' }, 'Codex 通道 · 1 折'),
+            config.cli?.codex && !config.cli.codex.found
+              ? h(
+                  'div',
+                  { className: 'sne-hint', style: { color: 'var(--sne-warn)' } },
+                  `⚠ 未找到 ${config.cli.codex.command}（${config.cli.codex.reason ?? '未知原因'}）。装好后重启 DSH，或在下面填绝对路径。`,
+                )
+              : null,
+            h(
+              Field,
+              { label: 'CLI 路径' },
+              h('input', {
+                className: 'sne-input sne-mono',
+                value: draft.codex.command ?? '',
+                placeholder: '留空 = 用 PATH 里的 codex',
+                spellCheck: false,
+                onChange: (event) => setDraft({ ...draft, codex: { ...draft.codex, command: event.target.value } }),
+              }),
+            ),
             h(
               Field,
               { label: '模型' },
@@ -488,6 +506,24 @@ window.__ModuleLoader__.load({
             { className: 'sne-card' },
             h('div', { className: 'sne-cardtitle' }, 'claude cli'),
             h('div', { className: 'sne-cardsub' }, 'Claude Code 通道 · 4 折'),
+            config.cli?.claude && !config.cli.claude.found
+              ? h(
+                  'div',
+                  { className: 'sne-hint', style: { color: 'var(--sne-warn)' } },
+                  `⚠ 未找到 ${config.cli.claude.command}（${config.cli.claude.reason ?? '未知原因'}）。装好后重启 DSH，或在下面填绝对路径。`,
+                )
+              : null,
+            h(
+              Field,
+              { label: 'CLI 路径' },
+              h('input', {
+                className: 'sne-input sne-mono',
+                value: draft.claude.command ?? '',
+                placeholder: '留空 = 用 PATH 里的 claude',
+                spellCheck: false,
+                onChange: (event) => setDraft({ ...draft, claude: { ...draft.claude, command: event.target.value } }),
+              }),
+            ),
             h(
               Field,
               { label: '模型' },
@@ -702,8 +738,8 @@ window.__ModuleLoader__.load({
             executeChannel: c.relay.executeChannel,
           },
           budget: { enabled: c.budget.enabled, dailyUsd: c.budget.dailyUsd },
-          codex: { model: c.codex.model, effort: c.codex.effort, sandbox: c.codex.sandbox },
-          claude: { model: c.claude.model, effort: c.claude.effort, permissionMode: c.claude.permissionMode },
+          codex: { command: c.codex.command ?? '', model: c.codex.model, effort: c.codex.effort, sandbox: c.codex.sandbox },
+          claude: { command: c.claude.command ?? '', model: c.claude.model, effort: c.claude.effort, permissionMode: c.claude.permissionMode },
         });
       }, [data]);
 

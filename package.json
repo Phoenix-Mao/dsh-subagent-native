@@ -57,7 +57,7 @@
   },
   "scripts": {
     "test": "node --test",
-    "lint": "node --check index.js && node --check client.js && node --check lib/codex-run.js && node --check lib/claude-run.js && node --check lib/history.js && node --check lib/budget.js && node --check lib/ledger.js && node --check lib/decisions.js && node --check lib/config.js && node --check lib/route-line.js && node --check lib/split.js && node --check lib/rules.js && node --check lib/difficulty.js && node --check lib/brief.js && node --check lib/native-config.js && node --check lib/git-snapshot.js && node --check lib/guard.js"
+    "lint": "node --check index.js && node --check client.js && node --check lib/codex-run.js && node --check lib/claude-run.js && node --check lib/history.js && node --check lib/budget.js && node --check lib/ledger.js && node --check lib/decisions.js && node --check lib/config.js && node --check lib/route-line.js && node --check lib/split.js && node --check lib/rules.js && node --check lib/difficulty.js && node --check lib/brief.js && node --check lib/native-config.js && node --check lib/git-snapshot.js && node --check lib/guard.js && node --check lib/cli-probe.js"
   },
   "engines": {
     "node": ">=22",
