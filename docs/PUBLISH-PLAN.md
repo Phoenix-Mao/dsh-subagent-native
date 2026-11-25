@@ -95,7 +95,9 @@
       pending-promise 判定（`Promise resolution is still pending but the event loop has already resolved`），
       Node 24 正常。怀疑与 `idleTimer.unref()` / `drain.unref()` 有关，需在 22 上单独复现后决定
       是改代码还是把 `engines.node` 收紧到 `>=24`
-- [ ] 跨平台冒烟：macOS / Linux 上至少验证 `buildCodexArgs` / `buildClaudeArgs` 与进程终止；参数差异记进 README
+- [x] **Linux 冒烟（部分）**：CI 的 `linux` job（ubuntu + Node 24）跑通全量 152 用例，
+      含 POSIX-only 的可执行位用例 → 纯逻辑与参数构造跨平台 OK（2026-11-26）
+- [ ] macOS 冒烟；以及「真实 CLI 进程终止」在非 Windows 上仍只在 Windows 观察过
 - [ ] DSH 版本兼容：在 0.2.2-rc.5 上装一遍；记录 provider 契约的版本敏感性
 - [ ] 安全复核：无 token/本机路径进包；`npm pack` 内容人工过一遍
 
