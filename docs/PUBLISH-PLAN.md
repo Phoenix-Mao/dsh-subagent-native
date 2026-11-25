@@ -89,17 +89,19 @@
 
 ### P3 · 质量门（1 天）
 
-- [x] GitHub Actions：Windows/Node 24 上 `npm test`（143 用例）+ lint + `npm pack --dry-run`（必过）；
-      `node22` 与 `linux` 两个信息性 job（`continue-on-error`）— 2026-11-26 首次跑通后修正
-- [ ] **Node 22 待查**：6 个「提前退出/取消」用例在 Node 22 上触发 `node:test` 的
-      pending-promise 判定（`Promise resolution is still pending but the event loop has already resolved`），
-      Node 24 正常。怀疑与 `idleTimer.unref()` / `drain.unref()` 有关，需在 22 上单独复现后决定
-      是改代码还是把 `engines.node` 收紧到 `>=24`
-- [x] **Linux 冒烟（部分）**：CI 的 `linux` job（ubuntu + Node 24）跑通全量 152 用例，
-      含 POSIX-only 的可执行位用例 → 纯逻辑与参数构造跨平台 OK（2026-11-26）
-- [ ] macOS 冒烟；以及「真实 CLI 进程终止」在非 Windows 上仍只在 Windows 观察过
-- [ ] DSH 版本兼容：在 0.2.2-rc.5 上装一遍；记录 provider 契约的版本敏感性
-- [ ] 安全复核：无 token/本机路径进包；`npm pack` 内容人工过一遍
+- [x] GitHub Actions：三个 job **全部必过**——Windows/Node 24（test+lint+pack）、
+      Windows/Node 22（test）、Ubuntu/Node 24（test+lint）— 2026-11-26
+- [x] **Node 22 已修**：根因是进程退出后的 200ms「排空定时器」被 `unref()`，而它正是该分支
+      唯一的结算来源；假句柄场景下没有真实子进程撑住事件循环 → Promise 永不 settle →
+      Node 22 的 `node:test` 判定 pending 后取消。改为 ref 并在 `finish()` 里主动清掉。
+      Node 22 / 24 上均 151 过 + 1 跳过 + 0 取消
+- [x] **Linux 冒烟**：ubuntu/Node 24 全量用例通过（含 POSIX-only 的可执行位用例）
+- [ ] macOS 冒烟；「真实 CLI 进程终止」在非 Windows 上仍只在 Windows 观察过
+- [x] DSH 版本兼容：README 新增「兼容性」表，列出用到的 6 个 DSH 接口与各自失效表现
+      （0.2.2-rc.5 上运行中；**改完代码后的实际装载验证要重启 DSH**）
+- [x] 安全复核：真跑 `npm pack` 解包人工过清单——26 文件 / 62.4 kB，扫描无 token、
+      无本机绝对路径、无 ATE 相关字样；只剩作者名（`author` 与 LICENSE 版权行，属预期）。
+      同时把 `docs/` 从 `files` 移出（内部分计划文档不该随包发布）
 
 验收：CI 绿；两平台冒烟通过；包内无敏感信息。
 

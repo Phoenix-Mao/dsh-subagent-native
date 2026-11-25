@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  # 必过：发布依据。Node 24 是作者本机验证过的运行时
+  # 主目标平台 + 本机验证的运行时
   test:
     runs-on: windows-latest
     steps:
@@ -21,11 +21,9 @@ jobs:
       - name: 打包内容校验
         run: npm pack --dry-run
 
-  # 信息性：engines.node 声明了 >=22，但 22 上仍有 6 个「提前退出/取消」用例
-  # 触发 node:test 的 pending-promise 判定，尚未定位。先跑不阻塞，见 PUBLISH-PLAN P3。
+  # engines.node 声明了 >=22，必须在 22 上也是绿的
   node22:
     runs-on: windows-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,10 +32,9 @@ jobs:
       - name: 单测
         run: npm test
 
-  # 信息性：目前只在 Windows 验证过，跨平台转正见 PUBLISH-PLAN P3
+  # 跨平台：纯逻辑与参数构造在 Linux 上跑全量用例（真实 CLI 进程终止仍以 Windows 观察为准）
   linux:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

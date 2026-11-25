@@ -237,6 +237,24 @@ stopReason / exitCode / 事件数 / 诊断 / stderr 尾部。
 
 接口：`GET /api/subagent-native/history`、`POST /api/subagent-native/history/clear`。
 
+## 兼容性（DSH 版本）
+
+`engines.dsh` 声明 `>=0.2.2-rc.5 <0.3.0`。**0.3 之后不保证能用**：本插件依赖 DSH 的一组主机侧接口，
+DSH 仍处于 RC，契约随时可能变。
+
+用到的接口（升级 DSH 后优先看这几处是否变）：
+
+| 接口 | 用途 | 失效表现 |
+|---|---|---|
+| `subagents.registerProvider()` | 把两条通道注册成 provider | 工具不存在 / 派发报 provider 未注册 |
+| `subprocess.spawn()` | 拉起 CLI 并等待 `done` | 派发直接抛错 |
+| `webServer.register({kind:'exact', handler})` | 设置页读写、历史接口 | 设置页 404 或保存无效 |
+| `configEditor.entries()/edit()` | 保存配置到 profile | 保存报「找不到 loader 条目」 |
+| `systemPrompt.context({name, order, text})` | 在运行时上下文显示路由行 | 路由行不显示（功能不受影响） |
+| `agent/pre-step`、`agent/created` | 兜底判定入口 | 自动派发不再触发 |
+
+排查顺序：先看设置页是否 404（webServer 契约）→ 再看工具是否出现（provider 契约）→ 最后看路由行（systemPrompt 契约）。
+
 ## 已知限制
 
 - **CLI 是一次性执行**：不能追问、不能多轮。协作只能靠 DSH 侧编排。
