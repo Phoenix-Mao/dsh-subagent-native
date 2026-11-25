@@ -1,0 +1,15 @@
+- insert:
+    - id: subagent-native
+      name: '@local/dsh-subagent-native'
+    - id: tool-subagent-native-codex
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: native-codex
+        toolName: subagent_native_codex
+        maxDepth: provider-managed
+    - id: tool-subagent-native-claude
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: native-claude
+        toolName: subagent_native_claude
+        maxDepth: provider-managed

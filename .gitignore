@@ -1,0 +1,11 @@
+# 依赖
+node_modules/
+
+# 运行时数据（插件在 profile 里产生的账本/历史/日志）
+.subagent-native/
+
+# 日志与临时文件
+*.log
+*.tmp
+Thumbs.db
+.DS_Store
