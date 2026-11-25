@@ -18,12 +18,12 @@
 
 | 项 | 现状 | 要求 | 阻塞级别 |
 |---|---|---|---|
-| 包名 | `@local/dsh-subagent-native` + `private: true` | 公共 npm 名（需查重） | P0 |
+| 包名 | ✅ `dsh-subagent-native`（2026-11-26 已改，7 处） | 公共 npm 名（已查重，可用） | ✅ |
 | `engines.dsh` | 无 | 例：`>=0.2.2-rc.5 <0.3.0` | P0 |
 | 显示元数据 | 无 locale | en/zh 的 title + description | P0 |
 | 图标 | 无 | 原创 SVG + `./icon` | P0 |
 | exports / files | `.` + `./client` | 补 `./locale/*.json`、`./icon`、`docs`、`LICENSE` | P0 |
-| patch 行名 | `@local/dsh-subagent-native` | 改为发布名 | P0 |
+| patch 行名 | ✅ 已改为 `dsh-subagent-native` | 与包名一致 | ✅ |
 | LICENSE | 无 | MIT（待定） | P0 |
 | README | 中文技术文档 | 中英双语：安装、前置依赖、安全、成本口径 | P1 |
 | 默认安全值 | `auto.enabled=false`（好）、`budget.dailyUsd=0`（无上限） | 已收紧：`claude.permissionMode=plan`、`codex.sandbox=read-only`、`budget.dailyUsd=2` | ✅ 已改 |

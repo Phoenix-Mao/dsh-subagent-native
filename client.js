@@ -11,7 +11,7 @@
  *   POST /api/subagent-native/history/clear
  */
 window.__ModuleLoader__.load({
-  id: '@local/dsh-subagent-native',
+  id: 'dsh-subagent-native',
   factory(require) {
     const React = require('react');
     const h = React.createElement;

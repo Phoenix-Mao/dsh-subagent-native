@@ -1,6 +1,6 @@
 - insert:
     - id: subagent-native
-      name: '@local/dsh-subagent-native'
+      name: 'dsh-subagent-native'
     - id: tool-subagent-native-codex
       name: '@deepseek-ai/dsh-tool-subagent'
       config:

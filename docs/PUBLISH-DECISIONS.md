@@ -10,9 +10,8 @@
 - 无 scope 的理由：个人项目、无组织；社区目录里同类插件多为无 scope
 - 备选（若将来需要）：`@phoenix-mao/dsh-subagent-native`
 
-⚠️ **改名不是现在做**：当前 profile 以 `@local/dsh-subagent-native` 的 junction 挂在运行环境里，
-改 package.json 的 name 会让正在使用的插件在下次重启后解析失败。
-改名与发布放在同一步（P4）执行，清单见第 6 节。
+✅ **改名已于 2026-11-26 执行完毕**（共 7 处，见第 6 节）。本地 profile 用
+`node_modules/dsh-subagent-native` 的 junction 挂载，重启 DSH 后生效。
 
 ## 2. 许可证
 
@@ -49,21 +48,25 @@
 理由：装完默认什么都不发生（`tools.enabled` / `auto.enabled` 都是 false），
 一旦用户打开派发，$2/天是「能跑几十次」和「被扣爆」之间的合理刹车。
 
-## 6. 改名清单（P4 执行，共 6 处）
+## 6. 改名清单（✅ 2026-11-26 已完成）
 
-改名前先在 profile 外备份。顺序如下：
+实际改了 **7 处**（原估 6 处，漏了 client.js 的 ModuleLoader id——漏了它表现为「插件装上了但设置页空白」）：
 
 1. `package.json`：`name` → `dsh-subagent-native`
 2. `lib/config.js`：`PACKAGE_NAME` → `'dsh-subagent-native'`
-3. 插件自带 `cordis.patch.yml`：insert 列表里的 `name` → `dsh-subagent-native`
-4. profile `package.json`：`dependencies` 的 key 与 `dsh.profile.bundles` 数组项
-5. profile `cordis.patch.yml`：`- id: subagent-native` 不用改（按 id 定向），确认无 `name:` 字段
-6. `profiles/desktop/node_modules/@local/dsh-subagent-native` junction → 重建为
-   `node_modules/dsh-subagent-native`
+3. 插件自带 `cordis.patch.yml`：insert 列表里的 `name`
+4. `client.js`：`window.__ModuleLoader__.load({ id })` ← **容易漏**
+5. profile `package.json`：`dependencies` 的 key
+6. profile `package.json`：`dsh.profile.bundles` 数组项
+7. profile `node_modules/@local/dsh-subagent-native` junction → 重建为 `node_modules/dsh-subagent-native`
+
+profile `cordis.patch.yml` 不用改（`- id: subagent-native` 是按 id 定向）。
+
+已加 `test/package-consistency.test.js` 守住 1~3 与 5 的一致性：以后改名漏掉任一处，CI 立刻红。
 
 验证：重启 DSH → 设置页「子代理」出现 → `GET /api/subagent-native/history` 有响应。
 
-回滚：把上面 6 处改回 `@local/...` 即可。
+回滚：把上面 7 处改回 `@local/...` 即可。
 
 ## 7. 已知不做的项
 

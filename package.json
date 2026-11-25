@@ -1,5 +1,5 @@
 {
-  "name": "@local/dsh-subagent-native",
+  "name": "dsh-subagent-native",
   "version": "0.1.0",
   "description": "把本机原生 codex / claude CLI 注册成 DSH 的子代理通道：走 CLI 原生配置与账号，框架可兜底派发，带并行扇出、预算护栏和成本核算。",
   "type": "module",
