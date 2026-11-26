@@ -2,6 +2,17 @@
 
 > 对应 `PUBLISH-PLAN.md` 的 P0。定于 2026-11-25。
 
+## 0. 发布记录
+
+| 项 | 值 |
+|---|---|
+| 首次发布 | **2026-11-26** `dsh-subagent-native@0.1.0` |
+| npm 账号 | `phoenix_mao` |
+| 包地址 | https://www.npmjs.com/package/dsh-subagent-native |
+| 仓库 | https://github.com/Phoenix-Mao/dsh-subagent-native （已 public） |
+| 包体积 | 26 文件 / 62.4 kB（unpacked 189.6 kB） |
+| 踩到的坑 | ① npm 已禁用 `--auth-type=legacy` 建号，只能走网页 ② 发布必须真 2FA，邮箱 OTP 只对账号操作有效 ③ 新账号走 staged publishing：登录时会先出现 `0.0.0-stage` 占位版本，随后真实版本生效，`dist-tags.latest` 才是准的 |
+
 ## 1. 包名与 scope
 
 **决定：`dsh-subagent-native`（无 scope）。**

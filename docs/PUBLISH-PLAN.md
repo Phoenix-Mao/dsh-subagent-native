@@ -107,8 +107,11 @@
 
 ### P4 · 发布（0.5 天）
 
-- [ ] `npm publish --access public`
-- [ ] GitHub Release（含变更说明与已知限制）
+- [x] `npm publish` — **2026-11-26 已发布 `dsh-subagent-native@0.1.0`**
+      （npm 目前走 staged publishing：登录时会先建一个 `0.0.0-stage` 临时占位版本，
+      真实版本 `0.1.0` 随后生效，`dist-tags.latest = 0.1.0`）
+- [x] GitHub 仓库转 public（社区目录靠 `owner/repo` 生成条目）
+- [ ] GitHub Release（含变更说明与已知限制）← 正在做
 - [ ] 用**干净 profile** 从 npm 装一次（不是本地 link），确认：工具可用、设置页出现、历史落盘、预算生效
 - [ ] 等社区目录收录（自动），核对条目字段：description 中英、engines、repository、category
 
